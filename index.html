@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 SaaS Real Estate</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #3C484B;
+            font-family: 'Segoe UI', sans-serif;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .header {
+            color: #FFFFFF;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0.5em 0 1.5em 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .sidebar {
+            background-color: #2E383B;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header {
+            color: #F9FAFB;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: #3C4345;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3f ease;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            background: #f9ca24;
+            color: #000;
+        }
+
+        .action-btn.active {
+            background: #f9ca24;
+            color: #000;
+        }
+
+        .content-section {
+            background: #2E383B;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #f9ca24;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: rgba(249, 202, 36, 0.1);
+        }
+
+        .file-upload-area.dragover {
+            background: rgba(249, 202, 36, 0.2);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: #f9ca24;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            color: #000;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 6px;
+            background: #3C4345;
+            color: #FFFFFF;
+            font-size: 1rem;
+        }
+
+        .submit-btn {
+            background: #28a745;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            color: #FFFFFF;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: #3C4345;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #4A5559;
+        }
+
+        .data-table th {
+            background: #f9ca24;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            color: #28a745;
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            color: #ffc107;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #3C4345;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f9ca24;
+        }
+
+        .stat-label {
+            color: #FFFFFF;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            🏠 SaaS Real Estate | Plataforma Inmobiliaria de IA
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-header">
+                🔎 Acciones disponibles
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn active" onclick="showSection('upload')">📂 Cargar Datos</button>
+                <button class="action-btn" onclick="showSection('register-piso')">📝 Registrar Piso</button>
+                <button class="action-btn" onclick="showSection('register-cliente')">🧍 Registrar Cliente</button>
+                <button class="action-btn" onclick="showSection('match-clients')">🔍 Buscar Clientes</button>
+                <button class="action-btn" onclick="showSection('match-pisos')">🏡 Buscar Pisos</button>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div id="upload" class="content-section active">
+            <h2>📂 Cargar Archivos Excel</h2>
+            <p style="margin-bottom: 2rem; opacity: 0.8;">Sube los archivos Excel de clientes y pisos para comenzar.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="clientesCount">0</div>
+                    <div class="stat-label">Clientes Cargados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pisosCount">0</div>
+                    <div class="stat-label">Pisos Cargados</div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div>
+                    <h3>Archivo de Clientes</h3>
+                    <div class="file-upload-area" id="clientesUpload">
+                        <p>📊 Arrastra aquí el archivo de clientes (.xlsx)</p>
+                        <button class="upload-btn" onclick="document.getElementById('clientesFile').click()">
+                            Seleccionar Archivo
+                        </button>
+                        <input type="file" id="clientesFile" class="file-input" accept=".xlsx,.xls" onchange="handleFileUpload('clientes', this.files[0])">
+                    </div>
+                </div>
+                
+                <div>
+                    <h3>Archivo de Pisos</h3>
+                    <div class="file-upload-area" id="pisosUpload">
+                        <p>🏠 Arrastra aquí el archivo de pisos (.xlsx)</p>
+                        <button class="upload-btn" onclick="document.getElementById('pisosFile').click()">
+                            Seleccionar Archivo
+                        </button>
+                        <input type="file" id="pisosFile" class="file-input" accept=".xlsx,.xls" onchange="handleFileUpload('pisos', this.files[0])">
+                    </div>
+                </div>
+            </div>
+
+            <div id="dataPreview"></div>
+        </div>
+
+        <!-- Register Piso Section -->
+        <div id="register-piso" class="content-section">
+            <h2>📝 Registro de nuevo piso</h2>
+            <form id="pisoForm" onsubmit="registerPiso(event)">
+                <div class="form-grid">
+                    <div>
+                        <div class="form-group">
+                            <label>Zona</label>
+                            <select id="zona" required>
+                                <option value="">Seleccionar zona</option>
+                                <option value="0">Zona 0</option>
+                                <option value="1">Zona 1</option>
+                                <option value="2">Zona 2</option>
+                                <option value="3">Zona 3</option>
+                                <option value="4">Zona 4</option>
+                                <option value="5">Zona 5</option>
+                                <option value="6">Zona 6</option>
+                                <option value="7">Zona 7</option>
+                                <option value="8">Zona 8</option>
+                                <option value="9">Zona 9</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Precio (€)</label>
+                            <input type="number" id="precio" min="40000" max="400000" step="10000" value="100000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Vivienda</label>
+                            <select id="tipo" required>
+                                <option value="Piso">Piso</option>
+                                <option value="Casa">Casa</option>
+                                <option value="Chalet">Chalet</option>
+                                <option value="Adosado">Adosado</option>
+                                <option value="Dúplex">Dúplex</option>
+                                <option value="Ático">Ático</option>
+                                <option value="Estudio">Estudio</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <select id="estado" required>
+                                <option value="Obra Nueva">Obra Nueva</option>
+                                <option value="Buen Estado">Buen Estado</option>
+                                <option value="A Reformar">A Reformar</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Calefacción</label>
+                            <select id="calefaccion" required>
+                                <option value="Geotermia">Geotermia</option>
+                                <option value="Gas">Gas</option>
+                                <option value="Electrica">Eléctrica</option>
+                                <option value="Bomba de calor">Bomba de calor</option>
+                                <option value="No disponible">No disponible</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Planta</label>
+                            <input type="number" id="planta" min="0" max="10" value="1" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label>Metros Cuadrados</label>
+                            <input type="number" id="metros" min="30" max="400" step="5" value="90" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Habitaciones</label>
+                            <input type="number" id="habitaciones" min="1" max="5" value="3" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Baños</label>
+                            <input type="number" id="banos" min="1" max="4" value="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Situación</label>
+                            <select id="situacion" required>
+                                <option value="disponible">Disponible</option>
+                                <option value="alquilado">Alquilado</option>
+                                <option value="nuda propiedad">Nuda propiedad</option>
+                                <option value="ocupada ilegalmente">Ocupada ilegalmente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ascensor</label>
+                            <select id="ascensor" required>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cocina</label>
+                            <select id="cocina" required>
+                                <option value="Gas">Gas</option>
+                                <option value="Electrica">Eléctrica</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label>Balcón</label>
+                            <select id="balcon" required>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Terraza</label>
+                            <select id="terraza" required>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Patio</label>
+                            <select id="patio" required>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Bajo</label>
+                            <select id="bajo" required>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Garaje</label>
+                            <select id="garaje" required>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Trastero</label>
+                            <select id="trastero" required>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">✅ Registrar Piso</button>
+            </form>
+            
+            <div id="pisoResults"></div>
+        </div>
+
+        <!-- Register Cliente Section -->
+        <div id="register-cliente" class="content-section">
+            <h2>🧍 Registro de nuevo cliente</h2>
+            <form id="clienteForm" onsubmit="registerCliente(event)">
+                <div class="form-grid">
+                    <div>
+                        <div class="form-group">
+                            <label>Entrada (%)</label>
+                            <input type="number" id="entrada" min="0" max="30" step="5" value="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Zona Preferida</label>
+                            <select id="zonaCliente" required>
+                                <option value="">Seleccionar zona</option>
+                                <option value="0">Zona 0</option>
+                                <option value="1">Zona 1</option>
+                                <option value="2">Zona 2</option>
+                                <option value="3">Zona 3</option>
+                                <option value="4">Zona 4</option>
+                                <option value="5">Zona 5</option>
+                                <option value="6">Zona 6</option>
+                                <option value="7">Zona 7</option>
+                                <option value="8">Zona 8</option>
+                                <option value="9">Zona 9</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Habitaciones deseadas</label>
+                            <input type="number" id="habitacionesCliente" min="1" max="5" value="3" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Baños deseados</label>
+                            <input type="number" id="banosCliente" min="1" max="4" value="2" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">✅ Registrar Cliente</button>
+            </form>
+            
+            <div id="clienteResults"></div>
+        </div>
+
+        <!-- Match Clients Section -->
+        <div id="match-clients" class="content-section">
+            <h2>🔍 Buscar Clientes para un Piso</h2>
+            <div class="form-group">
+                <label>Seleccionar Piso</label>
+                <select id="pisoSelect" onchange="matchClientsForPiso()">
+                    <option value="">Seleccionar un piso...</option>
+                </select>
+            </div>
+            <div id="clientMatchResults"></div>
+        </div>
+
+        <!-- Match Pisos Section -->
+        <div id="match-pisos" class="content-section">
+            <h2>🏡 Buscar Pisos para un Cliente</h2>
+            <div class="form-group">
+                <label>Seleccionar Cliente</label>
+                <select id="clienteSelect" onchange="matchPisosForClient()">
+                    <option value="">Seleccionar un cliente...</option>
+                </select>
+            </div>
+            <div id="pisoMatchResults"></div>
+        </div>
+    </div>
+
+    <script>
+        let clientesData = [];
+        let pisosData = [];
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Update dropdowns when showing match sections
+            if (sectionId === 'match-clients') {
+                updatePisoSelect();
+            } else if (sectionId === 'match-pisos') {
+                updateClienteSelect();
+            }
+        }
+
+        function handleFileUpload(type, file) {
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                
+                if (type === 'clientes') {
+                    clientesData = jsonData;
+                    document.getElementById('clientesCount').textContent = clientesData.length;
+                    showAlert('success', `✅ ${clientesData.length} clientes cargados correctamente`);
+                } else if (type === 'pisos') {
+                    pisosData = jsonData;
+                    document.getElementById('pisosCount').textContent = pisosData.length;
+                    showAlert('success', `✅ ${pisosData.length} pisos cargados correctamente`);
+                }
+                
+                updateSelects();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const preview = document.getElementById('dataPreview');
+            preview.insertBefore(alertDiv, preview.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function registerPiso(event) {
+            event.preventDefault();
+            
+            const newPiso = {
+                "Zona": parseInt(document.getElementById('zona').value),
+                "Precio": parseInt(document.getElementById('precio').value),
+                "Tipo de Vivienda": document.getElementById('tipo').value,
+                "Situacion": document.getElementById('situacion').value,
+                "Estado": document.getElementById('estado').value,
+                "Ascensor": document.getElementById('ascensor').value,
+                "Planta": parseInt(document.getElementById('planta').value),
+                "Metros Cuadrados": parseInt(document.getElementById('metros').value),
+                "Balcon": document.getElementById('balcon').value,
+                "Bajo": document.getElementById('bajo').value,
+                "Patio": document.getElementById('patio').value,
+                "Terraza": document.getElementById('terraza').value,
+                "Cocina": document.getElementById('cocina').value,
+                "Garaje": document.getElementById('garaje').value,
+                "Trastero": document.getElementById('trastero').value,
+                "Calefaccion": document.getElementById('calefaccion').value,
+                "Habitaciones": parseInt(document.getElementById('habitaciones').value),
+                "Baños": parseInt(document.getElementById('banos').value)
+            };
+            
+            pisosData.push(newPiso);
+            document.getElementById('pisosCount').textContent = pisosData.length;
+            
+            // Find compatible clients
+            const compatibleClients = matchPisosConClientes(newPiso, clientesData);
+            
+            const resultsDiv = document.getElementById('pisoResults');
+            resultsDiv.innerHTML = `
+                <div class="alert alert-success">✅ Piso registrado correctamente</div>
+                <h3>🎯 Clientes compatibles (${compatibleClients.length})</h3>
+                ${createTable(compatibleClients)}
+            `;
+            
+            document.getElementById('pisoForm').reset();
+            updateSelects();
+        }
+
+        function registerCliente(event) {
+            event.preventDefault();
+            
+            const entrada = parseInt(document.getElementById('entrada').value);
+            const newCliente = {
+                "Entrada Cliente": entrada,
+                "Zona": parseInt(document.getElementById('zonaCliente').value),
+                "Precio": entrada * 10000,
+                "Tipo de Vivienda": '',
+                "Situacion": '',
+                "Estado": '',
+                "Ascensor": '',
+                "Planta": 0,
+                "Metros Cuadrados": 0,
+                "Balcon": '',
+                "Bajo": '',
+                "Patio": '',
+                "Terraza": '',
+                "Cocina": '',
+                "Garaje": '',
+                "Trastero": '',
+                "Calefaccion": '',
+                "Habitaciones": parseInt(document.getElementById('habitacionesCliente').value),
+                "Baños": parseInt(document.getElementById('banosCliente').value)
+            };
+            
+            clientesData.push(newCliente);
+            document.getElementById('clientesCount').textContent = clientesData.length;
+            
+            // Find compatible pisos
+            const compatiblePisos = matchClientesConPisos(newCliente, pisosData);
+            
+            const resultsDiv = document.getElementById('clienteResults');
+            resultsDiv.innerHTML = `
+                <div class="alert alert-success">✅ Cliente registrado correctamente</div>
+                <h3>🏡 Pisos compatibles (${compatiblePisos.length})</h3>
+                ${createTable(compatiblePisos)}
+            `;
+            
+            document.getElementById('clienteForm').reset();
+            updateSelects();
+        }
+
+        function matchPisosConClientes(piso, clientes) {
+            return clientes.filter(cliente => 
+                cliente["Zona"] === piso["Zona"] &&
+                (cliente["Entrada Cliente"] * 10000) >= piso["Precio"] &&
+                cliente["Habitaciones"] >= piso["Habitaciones"]
+            );
+        }
+
+        function matchClientesConPisos(cliente, pisos) {
+            return pisos.filter(piso => 
+                piso["Zona"] === cliente["Zona"] &&
+                piso["Precio"] <= (cliente["Entrada Cliente"] * 10000) &&
+                piso["Habitaciones"] >= cliente["Habitaciones"]
+            );
+        }
+
+        function updatePisoSelect() {
+            const select = document.getElementById('pisoSelect');
+            select.innerHTML = '<option value="">Seleccionar un piso...</option>';
+            
+            pisosData.forEach((piso, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Piso ${index + 1} - Zona ${piso.Zona} - ${piso.Precio}€ - ${piso.Habitaciones} hab.`;
+                select.appendChild(option);
+            });
+        }
+
+        function updateClienteSelect() {
+            const select = document.getElementById('clienteSelect');
+            select.innerHTML = '<option value="">Seleccionar un cliente...</option>';
+            
+            clientesData.forEach((cliente, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Cliente ${index + 1} - Zona ${cliente.Zona} - ${cliente["Entrada Cliente"]}% entrada - ${cliente.Habitaciones} hab.`;
+                select.appendChild(option);
+            });
+        }
+
+        function updateSelects() {
+            updatePisoSelect();
+            updateClienteSelect();
+        }
+
+        function matchClientsForPiso() {
+            const select = document.getElementById('pisoSelect');
+            const pisoIndex = select.value;
+            
+            if (pisoIndex === '') {
+                document.getElementById('clientMatchResults').innerHTML = '';
+                return;
+            }
+            
+            const piso = pisosData[pisoIndex];
+            const compatibleClients = matchPisosConClientes(piso, clientesData);
+            
+            document.getElementById('clientMatchResults').innerHTML = `
+                <h3>🎯 Clientes compatibles (${compatibleClients.length})</h3>
+                ${createTable(compatibleClients)}
+            `;
+        }
+
+        function matchPisosForClient() {
+            const select = document.getElementById('clienteSelect');
+            const clientIndex = select.value;
+            
+            if (clientIndex === '') {
+                document.getElementById('pisoMatchResults').innerHTML = '';
+                return;
+            }
+            
+            const cliente = clientesData[clientIndex];
+            const compatiblePisos = matchClientesConPisos(cliente, pisosData);
+            
+            document.getElementById('pisoMatchResults').innerHTML = `
+                <h3>🏡 Pisos compatibles (${compatiblePisos.length})</h3>
+                ${createTable(compatiblePisos)}
+            `;
+        }
+
+        function createTable(data) {
+            if (data.length === 0) {
+                return '<p>No se encontraron coincidencias.</p>';
+            }
+            
+            const keys = Object.keys(data[0]);
+            let html = '<table class="data-table"><thead><tr>';
+            
+            keys.forEach(key => {
+                html += `<th>${key}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            data.forEach(row => {
+                html += '<tr>';
+                keys.forEach(key => {
+                    html += `<td>${row[key] || ''}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+
+        // Setup drag and drop
+        ['clientesUpload', 'pisosUpload'].forEach(id => {
+            const uploadArea = document.getElementById(id);
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const type = id === 'clientesUpload' ? 'clientes' : 'pisos';
+                    handleFileUpload(type, files[0]);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
