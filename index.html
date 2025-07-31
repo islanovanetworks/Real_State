@@ -1,796 +1,1578 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏠 SaaS Real Estate</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: #3C484B;
-            font-family: 'Segoe UI', sans-serif;
-            color: #FFFFFF;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem;
-        }
-
-        .header {
-            color: #FFFFFF;
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin: 0.5em 0 1.5em 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-        }
-
-        .sidebar {
-            background-color: #2E383B;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-        }
-
-        .sidebar-header {
-            color: #F9FAFB;
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-        }
-
-        .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .action-btn {
-            background: #3C4345;
-            border: none;
-            padding: 1rem;
-            border-radius: 8px;
-            color: #FFFFFF;
-            cursor: pointer;
-            transition: all 0.3f ease;
-            font-size: 1rem;
-        }
-
-        .action-btn:hover {
-            background: #f9ca24;
-            color: #000;
-        }
-
-        .action-btn.active {
-            background: #f9ca24;
-            color: #000;
-        }
-
-        .content-section {
-            background: #2E383B;
-            padding: 2rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            display: none;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        .file-upload-area {
-            border: 2px dashed #f9ca24;
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            background: rgba(249, 202, 36, 0.1);
-        }
-
-        .file-upload-area.dragover {
-            background: rgba(249, 202, 36, 0.2);
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .upload-btn {
-            background: #f9ca24;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            color: #000;
-            cursor: pointer;
-            font-weight: 600;
-            margin: 0.5rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 6px;
-            background: #3C4345;
-            color: #FFFFFF;
-            font-size: 1rem;
-        }
-
-        .submit-btn {
-            background: #28a745;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 6px;
-            color: #FFFFFF;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            background: #3C4345;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid #4A5559;
-        }
-
-        .data-table th {
-            background: #f9ca24;
-            color: #000;
-            font-weight: 600;
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-        }
-
-        .alert-success {
-            background: rgba(40, 167, 69, 0.2);
-            border: 1px solid #28a745;
-            color: #28a745;
-        }
-
-        .alert-warning {
-            background: rgba(255, 193, 7, 0.2);
-            border: 1px solid #ffc107;
-            color: #ffc107;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: #3C4345;
-            padding: 1.5rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #f9ca24;
-        }
-
-        .stat-label {
-            color: #FFFFFF;
-            margin-top: 0.5rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MatchingProps | Plataforma Inmobiliaria Inteligente</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .glass-effect {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .section-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #f1f5f9;
+    }
+    .form-input {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    .form-input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+    .sidebar-item {
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .sidebar-item:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+    .sidebar-item.active {
+      background: #667eea;
+      color: white;
+    }
+    .form-section {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      background: #fafafa;
+    }
+    .form-section h3 {
+      color: #374151;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .multi-select-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .multi-select-item {
+      background: #f3f4f6;
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    .multi-select-item.selected {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    .multi-select-item:hover {
+      border-color: #667eea;
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            🏠 SaaS Real Estate | Plataforma Inmobiliaria de IA
-        </div>
+<body class="bg-gray-50">
+  <div id="root"></div>
 
-        <div class="sidebar">
-            <div class="sidebar-header">
-                🔎 Acciones disponibles
-            </div>
-            <div class="action-buttons">
-                <button class="action-btn active" onclick="showSection('upload')">📂 Cargar Datos</button>
-                <button class="action-btn" onclick="showSection('register-piso')">📝 Registrar Piso</button>
-                <button class="action-btn" onclick="showSection('register-cliente')">🧍 Registrar Cliente</button>
-                <button class="action-btn" onclick="showSection('match-clients')">🔍 Buscar Clientes</button>
-                <button class="action-btn" onclick="showSection('match-pisos')">🏡 Buscar Pisos</button>
-            </div>
-        </div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
 
-        <!-- Upload Section -->
-        <div id="upload" class="content-section active">
-            <h2>📂 Cargar Archivos Excel</h2>
-            <p style="margin-bottom: 2rem; opacity: 0.8;">Sube los archivos Excel de clientes y pisos para comenzar.</p>
+    const API_BASE = "https://matchingprops.onrender.com";
+    let token = null;
+    let companiaId = null;
+
+    // Multi-Select Component
+    const MultiSelect = ({ label, name, options, value, onChange, required = false }) => {
+      const handleItemClick = (option) => {
+        const currentValues = Array.isArray(value) ? value : [];
+        const isSelected = currentValues.includes(option);
+        
+        let newValues;
+        if (isSelected) {
+          newValues = currentValues.filter(v => v !== option);
+        } else {
+          newValues = [...currentValues, option];
+        }
+        
+        onChange({ target: { name, value: newValues } });
+      };
+
+      return (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {label} {required && '*'}
+          </label>
+          <div className="multi-select-container">
+            {options.map(option => (
+              <div
+                key={option}
+                className={`multi-select-item ${Array.isArray(value) && value.includes(option) ? 'selected' : ''}`}
+                onClick={() => handleItemClick(option)}
+              >
+                {option}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // Sidebar Component
+    const Sidebar = ({ activeSection, setActiveSection }) => (
+      <div className="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 p-6 z-10">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">🏠 MatchingProps</h2>
+          <p className="text-sm text-gray-500 mt-1">Plataforma Inmobiliaria Inteligente</p>
+        </div>
+        
+        <nav className="space-y-2">
+          {[
+            { id: 'clientes', label: 'Registrar Cliente', icon: '👤' },
+            { id: 'pisos', label: 'Registrar Piso', icon: '🏡' },
+            { id: 'searchClientes', label: 'Buscar Clientes', icon: '🔍' },
+            { id: 'searchPisos', label: 'Buscar Pisos', icon: '🏢' }
+          ].map(item => (
+            <button
+              key={item.id}
+              onClick={() => setActiveSection(item.id)}
+              className={`w-full text-left p-3 sidebar-item ${activeSection === item.id ? 'active' : ''}`}
+            >
+              <span className="mr-3 text-lg">{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+    );
+
+    // Login Component
+    const LoginForm = ({ onLogin }) => {
+      const [email, setEmail] = useState("");
+      const [password, setPassword] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        
+        try {
+          const response = await fetch(`${API_BASE}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ username: email, password }),
+          });
+          const data = await response.json();
+          
+          if (response.ok) {
+            token = data.access_token;
+            const payload = JSON.parse(atob(data.access_token.split(".")[1]));
+            companiaId = payload.compania_id;
+            onLogin();
+          } else {
+            alert("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
+          }
+        } catch (error) {
+          alert("Error de conexión. Inténtalo más tarde.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="min-h-screen gradient-bg flex items-center justify-center p-6">
+          <div className="w-full max-w-md">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-white mb-2">🏠 MatchingProps</h1>
+              <p className="text-white/80">Plataforma Inmobiliaria Inteligente</p>
+            </div>
             
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="clientesCount">0</div>
-                    <div class="stat-label">Clientes Cargados</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="pisosCount">0</div>
-                    <div class="stat-label">Pisos Cargados</div>
-                </div>
-            </div>
-
-            <div class="form-grid">
+            <div className="glass-effect rounded-2xl p-8">
+              <h2 className="text-2xl font-semibold text-white mb-6 text-center">Iniciar Sesión</h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                    <h3>Archivo de Clientes</h3>
-                    <div class="file-upload-area" id="clientesUpload">
-                        <p>📊 Arrastra aquí el archivo de clientes (.xlsx)</p>
-                        <button class="upload-btn" onclick="document.getElementById('clientesFile').click()">
-                            Seleccionar Archivo
-                        </button>
-                        <input type="file" id="clientesFile" class="file-input" accept=".xlsx,.xls" onchange="handleFileUpload('clientes', this.files[0])">
-                    </div>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Correo electrónico"
+                    className="w-full form-input bg-white/90 text-gray-900 placeholder-gray-500"
+                    required
+                  />
                 </div>
                 
                 <div>
-                    <h3>Archivo de Pisos</h3>
-                    <div class="file-upload-area" id="pisosUpload">
-                        <p>🏠 Arrastra aquí el archivo de pisos (.xlsx)</p>
-                        <button class="upload-btn" onclick="document.getElementById('pisosFile').click()">
-                            Seleccionar Archivo
-                        </button>
-                        <input type="file" id="pisosFile" class="file-input" accept=".xlsx,.xls" onchange="handleFileUpload('pisos', this.files[0])">
-                    </div>
-                </div>
-            </div>
-
-            <div id="dataPreview"></div>
-        </div>
-
-        <!-- Register Piso Section -->
-        <div id="register-piso" class="content-section">
-            <h2>📝 Registro de nuevo piso</h2>
-            <form id="pisoForm" onsubmit="registerPiso(event)">
-                <div class="form-grid">
-                    <div>
-                        <div class="form-group">
-                            <label>Zona</label>
-                            <select id="zona" required>
-                                <option value="">Seleccionar zona</option>
-                                <option value="0">Zona 0</option>
-                                <option value="1">Zona 1</option>
-                                <option value="2">Zona 2</option>
-                                <option value="3">Zona 3</option>
-                                <option value="4">Zona 4</option>
-                                <option value="5">Zona 5</option>
-                                <option value="6">Zona 6</option>
-                                <option value="7">Zona 7</option>
-                                <option value="8">Zona 8</option>
-                                <option value="9">Zona 9</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Precio (€)</label>
-                            <input type="number" id="precio" min="40000" max="400000" step="10000" value="100000" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo de Vivienda</label>
-                            <select id="tipo" required>
-                                <option value="Piso">Piso</option>
-                                <option value="Casa">Casa</option>
-                                <option value="Chalet">Chalet</option>
-                                <option value="Adosado">Adosado</option>
-                                <option value="Dúplex">Dúplex</option>
-                                <option value="Ático">Ático</option>
-                                <option value="Estudio">Estudio</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Estado</label>
-                            <select id="estado" required>
-                                <option value="Obra Nueva">Obra Nueva</option>
-                                <option value="Buen Estado">Buen Estado</option>
-                                <option value="A Reformar">A Reformar</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Calefacción</label>
-                            <select id="calefaccion" required>
-                                <option value="Geotermia">Geotermia</option>
-                                <option value="Gas">Gas</option>
-                                <option value="Electrica">Eléctrica</option>
-                                <option value="Bomba de calor">Bomba de calor</option>
-                                <option value="No disponible">No disponible</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Planta</label>
-                            <input type="number" id="planta" min="0" max="10" value="1" required>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <div class="form-group">
-                            <label>Metros Cuadrados</label>
-                            <input type="number" id="metros" min="30" max="400" step="5" value="90" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Habitaciones</label>
-                            <input type="number" id="habitaciones" min="1" max="5" value="3" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Baños</label>
-                            <input type="number" id="banos" min="1" max="4" value="2" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Situación</label>
-                            <select id="situacion" required>
-                                <option value="disponible">Disponible</option>
-                                <option value="alquilado">Alquilado</option>
-                                <option value="nuda propiedad">Nuda propiedad</option>
-                                <option value="ocupada ilegalmente">Ocupada ilegalmente</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Ascensor</label>
-                            <select id="ascensor" required>
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Cocina</label>
-                            <select id="cocina" required>
-                                <option value="Gas">Gas</option>
-                                <option value="Electrica">Eléctrica</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <div class="form-group">
-                            <label>Balcón</label>
-                            <select id="balcon" required>
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Terraza</label>
-                            <select id="terraza" required>
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Patio</label>
-                            <select id="patio" required>
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Bajo</label>
-                            <select id="bajo" required>
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Garaje</label>
-                            <select id="garaje" required>
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Trastero</label>
-                            <select id="trastero" required>
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                    </div>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Contraseña"
+                    className="w-full form-input bg-white/90 text-gray-900 placeholder-gray-500"
+                    required
+                  />
                 </div>
                 
-                <button type="submit" class="submit-btn">✅ Registrar Piso</button>
-            </form>
-            
-            <div id="pisoResults"></div>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full btn-primary py-4 text-lg font-semibold disabled:opacity-50"
+                >
+                  {loading ? "Iniciando sesión..." : "Entrar"}
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
+      );
+    };
 
-        <!-- Register Cliente Section -->
-        <div id="register-cliente" class="content-section">
-            <h2>🧍 Registro de nuevo cliente</h2>
-            <form id="clienteForm" onsubmit="registerCliente(event)">
-                <div class="form-grid">
-                    <div>
-                        <div class="form-group">
-                            <label>Entrada (%)</label>
-                            <input type="number" id="entrada" min="0" max="30" step="5" value="10" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Zona Preferida</label>
-                            <select id="zonaCliente" required>
-                                <option value="">Seleccionar zona</option>
-                                <option value="0">Zona 0</option>
-                                <option value="1">Zona 1</option>
-                                <option value="2">Zona 2</option>
-                                <option value="3">Zona 3</option>
-                                <option value="4">Zona 4</option>
-                                <option value="5">Zona 5</option>
-                                <option value="6">Zona 6</option>
-                                <option value="7">Zona 7</option>
-                                <option value="8">Zona 8</option>
-                                <option value="9">Zona 9</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="form-group">
-                            <label>Habitaciones deseadas</label>
-                            <input type="number" id="habitacionesCliente" min="1" max="5" value="3" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Baños deseados</label>
-                            <input type="number" id="banosCliente" min="1" max="4" value="2" required>
-                        </div>
-                    </div>
+    // Client Form Component
+    const ClientForm = ({ onRegister }) => {
+      const [formData, setFormData] = useState({
+        nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
+        tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: [],
+        ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
+        orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
+        patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
+        urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
+      });
+
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        const cliente = { 
+          ...formData, 
+          compania_id: companiaId, 
+          entrada: parseFloat(formData.entrada), 
+          precio: parseFloat(formData.precio), 
+          m2: parseInt(formData.m2), 
+          habitaciones: formData.habitaciones.map(Number) 
+        };
+        
+        try {
+          const response = await fetch(`${API_BASE}/clientes`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(cliente),
+          });
+          const result = await response.json();
+          
+          if (response.ok) {
+            alert(`✅ Cliente registrado: ${result.nombre}`);
+            setFormData({
+              nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
+              tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: [],
+              ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
+              orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
+              patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
+              urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
+            });
+            onRegister();
+          } else {
+            alert("❌ Error al registrar cliente: " + result.detail);
+          }
+        } catch (error) {
+          alert("❌ Error de conexión: " + error.message);
+        }
+      };
+
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">👤 Registro de Cliente</h2>
+            <p className="text-gray-600">Registra un nuevo cliente en el sistema</p>
+          </div>
+          
+          <form onSubmit={handleSubmit}>
+            {/* Información Básica */}
+            <div className="form-section">
+              <h3>Información Básica</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
+                  <input
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    placeholder="Nombre completo"
+                    className="w-full form-input"
+                    required
+                  />
                 </div>
                 
-                <button type="submit" class="submit-btn">✅ Registrar Cliente</button>
-            </form>
-            
-            <div id="clienteResults"></div>
-        </div>
-
-        <!-- Match Clients Section -->
-        <div id="match-clients" class="content-section">
-            <h2>🔍 Buscar Clientes para un Piso</h2>
-            <div class="form-group">
-                <label>Seleccionar Piso</label>
-                <select id="pisoSelect" onchange="matchClientsForPiso()">
-                    <option value="">Seleccionar un piso...</option>
-                </select>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono *</label>
+                  <input
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleChange}
+                    placeholder="Número de teléfono"
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Banco</label>
+                  <input
+                    name="banco"
+                    value={formData.banco}
+                    onChange={handleChange}
+                    placeholder="Entidad bancaria"
+                    className="w-full form-input"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">KÍRON</label>
+                  <select
+                    name="kiron"
+                    value={formData.kiron}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SK">SK</option>
+                    <option value="PK">PK</option>
+                    <option value="NK">NK</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div id="clientMatchResults"></div>
-        </div>
 
-        <!-- Match Pisos Section -->
-        <div id="match-pisos" class="content-section">
-            <h2>🏡 Buscar Pisos para un Cliente</h2>
-            <div class="form-group">
-                <label>Seleccionar Cliente</label>
-                <select id="clienteSelect" onchange="matchPisosForClient()">
-                    <option value="">Seleccionar un cliente...</option>
-                </select>
+            {/* Ubicación */}
+            <div className="form-section">
+              <h3>Ubicación</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <MultiSelect
+                  label="Zona"
+                  name="zona"
+                  options={["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
+                  value={formData.zona}
+                  onChange={handleChange}
+                  required={true}
+                />
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subzonas</label>
+                  <input
+                    name="subzonas"
+                    value={formData.subzonas}
+                    onChange={handleChange}
+                    placeholder="Subzonas específicas"
+                    className="w-full form-input"
+                  />
+                </div>
+              </div>
             </div>
-            <div id="pisoMatchResults"></div>
+
+            {/* Aspectos Económicos */}
+            <div className="form-section">
+              <h3>Aspectos Económicos</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Entrada *</label>
+                  <select
+                    name="entrada"
+                    value={formData.entrada}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  >
+                    <option value="">Seleccionar entrada</option>
+                    {[...Array(50).keys()].map(i => (
+                      <option key={i * 10000 + 10000} value={i * 10000 + 10000}>
+                        {(i * 10000 + 10000).toLocaleString()}€
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Precio *</label>
+                  <select
+                    name="precio"
+                    value={formData.precio}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  >
+                    <option value="">Seleccionar precio</option>
+                    {/* De 10.000€ a 200.000€ en incrementos de 10.000€ */}
+                    {[...Array(20).keys()].map(i => (
+                      <option key={i * 10000 + 10000} value={i * 10000 + 10000}>
+                        {(i * 10000 + 10000).toLocaleString()}€
+                      </option>
+                    ))}
+                    {/* De 220.000€ a 500.000€ en incrementos de 20.000€ */}
+                    {[...Array(15).keys()].map(i => (
+                      <option key={220000 + i * 20000} value={220000 + i * 20000}>
+                        {(220000 + i * 20000).toLocaleString()}€
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Permuta</label>
+                  <select
+                    name="permuta"
+                    value={formData.permuta}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Características de la Vivienda */}
+            <div className="form-section">
+              <h3>Características de la Vivienda</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <MultiSelect
+                  label="Tipo de Vivienda"
+                  name="tipo_vivienda"
+                  options={["Piso", "Ático", "Chalet"]}
+                  value={formData.tipo_vivienda}
+                  onChange={handleChange}
+                />
+                
+                <MultiSelect
+                  label="Finalidad"
+                  name="finalidad"
+                  options={["Primera Vivienda", "Inversión"]}
+                  value={formData.finalidad}
+                  onChange={handleChange}
+                />
+                
+                <MultiSelect
+                  label="Habitaciones"
+                  name="habitaciones"
+                  options={["0", "1", "2", "3", "4", "5"]}
+                  value={formData.habitaciones}
+                  onChange={handleChange}
+                />
+                
+                <MultiSelect
+                  label="Baños"
+                  name="banos"
+                  options={["1", "1+1", "2"]}
+                  value={formData.banos}
+                  onChange={handleChange}
+                />
+                
+                <MultiSelect
+                  label="Estado"
+                  name="estado"
+                  options={["Entrar a Vivir", "Actualizar", "A Reformar"]}
+                  value={formData.estado}
+                  onChange={handleChange}
+                />
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Metros² *</label>
+                  <select
+                    name="m2"
+                    value={formData.m2}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  >
+                    <option value="">Seleccionar m²</option>
+                    {[30,40,50,60,70,80,90,100,110,120,130,150].map(m => (
+                      <option key={m} value={m}>{m} m²</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Ubicación y Acceso */}
+            <div className="form-section">
+              <h3>Ubicación y Acceso</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Ascensor</label>
+                  <select
+                    name="ascensor"
+                    value={formData.ascensor}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Bajos</label>
+                  <select
+                    name="bajos"
+                    value={formData.bajos}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Entreplanta</label>
+                  <select
+                    name="entreplanta"
+                    value={formData.entreplanta}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Altura</label>
+                  <select
+                    name="altura"
+                    value={formData.altura}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="PRIMERAS PLANTAS">PRIMERAS PLANTAS</option>
+                    <option value="PLANTAS INTERMEDIAS">PLANTAS INTERMEDIAS</option>
+                    <option value="ÚLTIMAS PLANTAS">ÚLTIMAS PLANTAS</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Orientación y Transporte */}
+            <div className="form-section">
+              <h3>Orientación y Transporte</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <MultiSelect
+                  label="Orientación"
+                  name="orientacion"
+                  options={["Norte", "Sur", "Este", "Oeste", "Indiferente"]}
+                  value={formData.orientacion}
+                  onChange={handleChange}
+                />
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Cercanía Metro</label>
+                  <select
+                    name="cercania_metro"
+                    value={formData.cercania_metro}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="0-5 MIN">0-5 MIN</option>
+                    <option value="5-10 MIN">5-10 MIN</option>
+                    <option value="10-15 MIN">10-15 MIN</option>
+                    <option value="15-20 MIN">15-20 MIN</option>
+                    <option value="+20 MIN">+20 MIN</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Características del Edificio */}
+            <div className="form-section">
+              <h3>Características del Edificio</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Edificio Semi-nuevo</label>
+                  <select
+                    name="edificio_semi_nuevo"
+                    value={formData.edificio_semi_nuevo}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Adaptado Movilidad</label>
+                  <select
+                    name="adaptado_movilidad"
+                    value={formData.adaptado_movilidad}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Interior</label>
+                  <select
+                    name="interior"
+                    value={formData.interior}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="EXTERIOR">EXTERIOR</option>
+                    <option value="INTERIOR">INTERIOR</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Espacios Exteriores */}
+            <div className="form-section">
+              <h3>Espacios Exteriores</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Balcón</label>
+                  <select
+                    name="balcon"
+                    value={formData.balcon}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Patio</label>
+                  <select
+                    name="patio"
+                    value={formData.patio}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Terraza</label>
+                  <select
+                    name="terraza"
+                    value={formData.terraza}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Vistas</label>
+                  <select
+                    name="vistas"
+                    value={formData.vistas}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Servicios Adicionales */}
+            <div className="form-section">
+              <h3>Servicios Adicionales</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Garaje</label>
+                  <select
+                    name="garaje"
+                    value={formData.garaje}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="OPCIONAL">OPCIONAL</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Trastero</label>
+                  <select
+                    name="trastero"
+                    value={formData.trastero}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="OPCIONAL">OPCIONAL</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Piscina</label>
+                  <select
+                    name="piscina"
+                    value={formData.piscina}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Urbanización</label>
+                  <select
+                    name="urbanizacion"
+                    value={formData.urbanizacion}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Características Adicionales */}
+            <div className="form-section">
+              <h3>Información Adicional</h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Características Adicionales</label>
+                <textarea
+                  name="caracteristicas_adicionales"
+                  value={formData.caracteristicas_adicionales}
+                  onChange={handleChange}
+                  placeholder="Detalles adicionales sobre las preferencias del cliente..."
+                  rows="4"
+                  className="w-full form-input"
+                />
+              </div>
+            </div>
+            
+            <button type="submit" className="btn-primary px-8 py-3 text-lg font-semibold">
+              ✅ Registrar Cliente
+            </button>
+          </form>
         </div>
-    </div>
+      );
+    };
 
-    <script>
-        let clientesData = [];
-        let pisosData = [];
+    // Piso Form Component
+    const PisoForm = ({ onRegister }) => {
+      const [formData, setFormData] = useState({
+        direccion: "", portal: "", piso: "",
+        zona: "", precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: "",
+        ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
+        orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
+        patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
+        urbanizacion: "", vistas: "", caracteristicas_adicionales: ""
+      });
 
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        const piso = { 
+          ...formData, 
+          compania_id: companiaId, 
+          precio: parseFloat(formData.precio), 
+          m2: parseInt(formData.m2), 
+          habitaciones: formData.habitaciones.map(Number),
+          zona: [formData.zona] // Convert single selection to array for API compatibility
+        };
+        
+        try {
+          const response = await fetch(`${API_BASE}/pisos`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(piso),
+          });
+          const result = await response.json();
+          
+          if (response.ok) {
+            alert(`✅ Piso registrado con ID: ${result.id}`);
+            setFormData({
+              direccion: "", portal: "", piso: "",
+              zona: "", precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: "",
+              ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
+              orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
+              patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
+              urbanizacion: "", vistas: "", caracteristicas_adicionales: ""
             });
-            
-            // Remove active class from all buttons
-            document.querySelectorAll('.action-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Show selected section
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Add active class to clicked button
-            event.target.classList.add('active');
-            
-            // Update dropdowns when showing match sections
-            if (sectionId === 'match-clients') {
-                updatePisoSelect();
-            } else if (sectionId === 'match-pisos') {
-                updateClienteSelect();
-            }
+            onRegister();
+          } else {
+            alert("❌ Error al registrar piso: " + result.detail);
+          }
+        } catch (error) {
+          alert("❌ Error de conexión: " + error.message);
         }
+      };
 
-        function handleFileUpload(type, file) {
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">🏡 Registro de Piso</h2>
+            <p className="text-gray-600">Registra una nueva propiedad en el sistema</p>
+          </div>
+          
+          <form onSubmit={handleSubmit}>
+            {/* Información Básica */}
+            <div className="form-section">
+              <h3>Información Básica</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+                  <input
+                    name="direccion"
+                    value={formData.direccion}
+                    onChange={handleChange}
+                    placeholder="Dirección completa"
+                    className="w-full form-input"
+                  />
+                </div>
                 
-                if (type === 'clientes') {
-                    clientesData = jsonData;
-                    document.getElementById('clientesCount').textContent = clientesData.length;
-                    showAlert('success', `✅ ${clientesData.length} clientes cargados correctamente`);
-                } else if (type === 'pisos') {
-                    pisosData = jsonData;
-                    document.getElementById('pisosCount').textContent = pisosData.length;
-                    showAlert('success', `✅ ${pisosData.length} pisos cargados correctamente`);
-                }
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Portal</label>
+                  <input
+                    name="portal"
+                    value={formData.portal}
+                    onChange={handleChange}
+                    placeholder="Número de portal"
+                    className="w-full form-input"
+                  />
+                </div>
                 
-                updateSelects();
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function showAlert(type, message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            
-            const preview = document.getElementById('dataPreview');
-            preview.insertBefore(alertDiv, preview.firstChild);
-            
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 5000);
-        }
-
-        function registerPiso(event) {
-            event.preventDefault();
-            
-            const newPiso = {
-                "Zona": parseInt(document.getElementById('zona').value),
-                "Precio": parseInt(document.getElementById('precio').value),
-                "Tipo de Vivienda": document.getElementById('tipo').value,
-                "Situacion": document.getElementById('situacion').value,
-                "Estado": document.getElementById('estado').value,
-                "Ascensor": document.getElementById('ascensor').value,
-                "Planta": parseInt(document.getElementById('planta').value),
-                "Metros Cuadrados": parseInt(document.getElementById('metros').value),
-                "Balcon": document.getElementById('balcon').value,
-                "Bajo": document.getElementById('bajo').value,
-                "Patio": document.getElementById('patio').value,
-                "Terraza": document.getElementById('terraza').value,
-                "Cocina": document.getElementById('cocina').value,
-                "Garaje": document.getElementById('garaje').value,
-                "Trastero": document.getElementById('trastero').value,
-                "Calefaccion": document.getElementById('calefaccion').value,
-                "Habitaciones": parseInt(document.getElementById('habitaciones').value),
-                "Baños": parseInt(document.getElementById('banos').value)
-            };
-            
-            pisosData.push(newPiso);
-            document.getElementById('pisosCount').textContent = pisosData.length;
-            
-            // Find compatible clients
-            const compatibleClients = matchPisosConClientes(newPiso, clientesData);
-            
-            const resultsDiv = document.getElementById('pisoResults');
-            resultsDiv.innerHTML = `
-                <div class="alert alert-success">✅ Piso registrado correctamente</div>
-                <h3>🎯 Clientes compatibles (${compatibleClients.length})</h3>
-                ${createTable(compatibleClients)}
-            `;
-            
-            document.getElementById('pisoForm').reset();
-            updateSelects();
-        }
-
-        function registerCliente(event) {
-            event.preventDefault();
-            
-            const entrada = parseInt(document.getElementById('entrada').value);
-            const newCliente = {
-                "Entrada Cliente": entrada,
-                "Zona": parseInt(document.getElementById('zonaCliente').value),
-                "Precio": entrada * 10000,
-                "Tipo de Vivienda": '',
-                "Situacion": '',
-                "Estado": '',
-                "Ascensor": '',
-                "Planta": 0,
-                "Metros Cuadrados": 0,
-                "Balcon": '',
-                "Bajo": '',
-                "Patio": '',
-                "Terraza": '',
-                "Cocina": '',
-                "Garaje": '',
-                "Trastero": '',
-                "Calefaccion": '',
-                "Habitaciones": parseInt(document.getElementById('habitacionesCliente').value),
-                "Baños": parseInt(document.getElementById('banosCliente').value)
-            };
-            
-            clientesData.push(newCliente);
-            document.getElementById('clientesCount').textContent = clientesData.length;
-            
-            // Find compatible pisos
-            const compatiblePisos = matchClientesConPisos(newCliente, pisosData);
-            
-            const resultsDiv = document.getElementById('clienteResults');
-            resultsDiv.innerHTML = `
-                <div class="alert alert-success">✅ Cliente registrado correctamente</div>
-                <h3>🏡 Pisos compatibles (${compatiblePisos.length})</h3>
-                ${createTable(compatiblePisos)}
-            `;
-            
-            document.getElementById('clienteForm').reset();
-            updateSelects();
-        }
-
-        function matchPisosConClientes(piso, clientes) {
-            return clientes.filter(cliente => 
-                cliente["Zona"] === piso["Zona"] &&
-                (cliente["Entrada Cliente"] * 10000) >= piso["Precio"] &&
-                cliente["Habitaciones"] >= piso["Habitaciones"]
-            );
-        }
-
-        function matchClientesConPisos(cliente, pisos) {
-            return pisos.filter(piso => 
-                piso["Zona"] === cliente["Zona"] &&
-                piso["Precio"] <= (cliente["Entrada Cliente"] * 10000) &&
-                piso["Habitaciones"] >= cliente["Habitaciones"]
-            );
-        }
-
-        function updatePisoSelect() {
-            const select = document.getElementById('pisoSelect');
-            select.innerHTML = '<option value="">Seleccionar un piso...</option>';
-            
-            pisosData.forEach((piso, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `Piso ${index + 1} - Zona ${piso.Zona} - ${piso.Precio}€ - ${piso.Habitaciones} hab.`;
-                select.appendChild(option);
-            });
-        }
-
-        function updateClienteSelect() {
-            const select = document.getElementById('clienteSelect');
-            select.innerHTML = '<option value="">Seleccionar un cliente...</option>';
-            
-            clientesData.forEach((cliente, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `Cliente ${index + 1} - Zona ${cliente.Zona} - ${cliente["Entrada Cliente"]}% entrada - ${cliente.Habitaciones} hab.`;
-                select.appendChild(option);
-            });
-        }
-
-        function updateSelects() {
-            updatePisoSelect();
-            updateClienteSelect();
-        }
-
-        function matchClientsForPiso() {
-            const select = document.getElementById('pisoSelect');
-            const pisoIndex = select.value;
-            
-            if (pisoIndex === '') {
-                document.getElementById('clientMatchResults').innerHTML = '';
-                return;
-            }
-            
-            const piso = pisosData[pisoIndex];
-            const compatibleClients = matchPisosConClientes(piso, clientesData);
-            
-            document.getElementById('clientMatchResults').innerHTML = `
-                <h3>🎯 Clientes compatibles (${compatibleClients.length})</h3>
-                ${createTable(compatibleClients)}
-            `;
-        }
-
-        function matchPisosForClient() {
-            const select = document.getElementById('clienteSelect');
-            const clientIndex = select.value;
-            
-            if (clientIndex === '') {
-                document.getElementById('pisoMatchResults').innerHTML = '';
-                return;
-            }
-            
-            const cliente = clientesData[clientIndex];
-            const compatiblePisos = matchClientesConPisos(cliente, pisosData);
-            
-            document.getElementById('pisoMatchResults').innerHTML = `
-                <h3>🏡 Pisos compatibles (${compatiblePisos.length})</h3>
-                ${createTable(compatiblePisos)}
-            `;
-        }
-
-        function createTable(data) {
-            if (data.length === 0) {
-                return '<p>No se encontraron coincidencias.</p>';
-            }
-            
-            const keys = Object.keys(data[0]);
-            let html = '<table class="data-table"><thead><tr>';
-            
-            keys.forEach(key => {
-                html += `<th>${key}</th>`;
-            });
-            html += '</tr></thead><tbody>';
-            
-            data.forEach(row => {
-                html += '<tr>';
-                keys.forEach(key => {
-                    html += `<td>${row[key] || ''}</td>`;
-                });
-                html += '</tr>';
-            });
-            
-            html += '</tbody></table>';
-            return html;
-        }
-
-        // Setup drag and drop
-        ['clientesUpload', 'pisosUpload'].forEach(id => {
-            const uploadArea = document.getElementById(id);
-            
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Piso</label>
+                  <input
+                    name="piso"
+                    value={formData.piso}
+                    onChange={handleChange}
+                    placeholder="Número de piso"
+                    className="w-full form-input"
+                  />
+                </div>
                 
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    const type = id === 'clientesUpload' ? 'clientes' : 'pisos';
-                    handleFileUpload(type, files[0]);
-                }
-            });
-        });
-    </script>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Zona *</label>
+                  <select
+                    name="zona"
+                    value={formData.zona}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  >
+                    <option value="">Seleccionar zona</option>
+                    <option value="ALTO">ALTO</option>
+                    <option value="OLIVOS">OLIVOS</option>
+                    <option value="LAGUNA">LAGUNA</option>
+                    <option value="BATÁN">BATÁN</option>
+                    <option value="SEPÚLVEDA">SEPÚLVEDA</option>
+                    <option value="MANZANARES">MANZANARES</option>
+                    <option value="PÍO">PÍO</option>
+                    <option value="PUERTA">PUERTA</option>
+                    <option value="JESUITAS">JESUITAS</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Precio (€) *</label>
+                  <input
+                    name="precio"
+                    type="number"
+                    value={formData.precio}
+                    onChange={handleChange}
+                    placeholder="Precio en euros"
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Metros² *</label>
+                  <select
+                    name="m2"
+                    value={formData.m2}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  >
+                    <option value="">Seleccionar m²</option>
+                    {[30,40,50,60,70,80,90,100,110,120,130,150].map(m => (
+                      <option key={m} value={m}>{m} m²</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Características de la Vivienda */}
+            <div className="form-section">
+              <h3>Características de la Vivienda</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <MultiSelect
+                  label="Tipo de Vivienda"
+                  name="tipo_vivienda"
+                  options={["Piso", "Ático", "Chalet"]}
+                  value={formData.tipo_vivienda}
+                  onChange={handleChange}
+                />
+                
+                <MultiSelect
+                  label="Habitaciones"
+                  name="habitaciones"
+                  options={["0", "1", "2", "3", "4", "5"]}
+                  value={formData.habitaciones}
+                  onChange={handleChange}
+                />
+                
+                <MultiSelect
+                  label="Baños"
+                  name="banos"
+                  options={["1", "1+1", "2"]}
+                  value={formData.banos}
+                  onChange={handleChange}
+                />
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                  <select
+                    name="estado"
+                    value={formData.estado}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar estado</option>
+                    <option value="Entrar a Vivir">Entrar a Vivir</option>
+                    <option value="Actualizar">Actualizar</option>
+                    <option value="A Reformar">A Reformar</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Ubicación y Acceso */}
+            <div className="form-section">
+              <h3>Ubicación y Acceso</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Ascensor</label>
+                  <select
+                    name="ascensor"
+                    value={formData.ascensor}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Bajos</label>
+                  <select
+                    name="bajos"
+                    value={formData.bajos}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Entreplanta</label>
+                  <select
+                    name="entreplanta"
+                    value={formData.entreplanta}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Altura</label>
+                  <select
+                    name="altura"
+                    value={formData.altura}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="PRIMERAS PLANTAS">PRIMERAS PLANTAS</option>
+                    <option value="PLANTAS INTERMEDIAS">PLANTAS INTERMEDIAS</option>
+                    <option value="ÚLTIMAS PLANTAS">ÚLTIMAS PLANTAS</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Orientación y Transporte */}
+            <div className="form-section">
+              <h3>Orientación y Transporte</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <MultiSelect
+                  label="Orientación"
+                  name="orientacion"
+                  options={["Norte", "Sur", "Este", "Oeste", "Indiferente"]}
+                  value={formData.orientacion}
+                  onChange={handleChange}
+                />
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Cercanía Metro</label>
+                  <select
+                    name="cercania_metro"
+                    value={formData.cercania_metro}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="0-5 MIN">0-5 MIN</option>
+                    <option value="5-10 MIN">5-10 MIN</option>
+                    <option value="10-15 MIN">10-15 MIN</option>
+                    <option value="15-20 MIN">15-20 MIN</option>
+                    <option value="+20 MIN">+20 MIN</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Características del Edificio */}
+            <div className="form-section">
+              <h3>Características del Edificio</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Edificio Semi-nuevo</label>
+                  <select
+                    name="edificio_semi_nuevo"
+                    value={formData.edificio_semi_nuevo}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Adaptado Movilidad</label>
+                  <select
+                    name="adaptado_movilidad"
+                    value={formData.adaptado_movilidad}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Interior</label>
+                  <select
+                    name="interior"
+                    value={formData.interior}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="EXTERIOR">EXTERIOR</option>
+                    <option value="INTERIOR">INTERIOR</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Espacios Exteriores */}
+            <div className="form-section">
+              <h3>Espacios Exteriores</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Balcón</label>
+                  <select
+                    name="balcon"
+                    value={formData.balcon}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Patio</label>
+                  <select
+                    name="patio"
+                    value={formData.patio}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Terraza</label>
+                  <select
+                    name="terraza"
+                    value={formData.terraza}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Vistas</label>
+                  <select
+                    name="vistas"
+                    value={formData.vistas}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Servicios Adicionales */}
+            <div className="form-section">
+              <h3>Servicios Adicionales</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Garaje</label>
+                  <select
+                    name="garaje"
+                    value={formData.garaje}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Trastero</label>
+                  <select
+                    name="trastero"
+                    value={formData.trastero}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Piscina</label>
+                  <select
+                    name="piscina"
+                    value={formData.piscina}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Urbanización</label>
+                  <select
+                    name="urbanizacion"
+                    value={formData.urbanizacion}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Características Adicionales */}
+            <div className="form-section">
+              <h3>Información Adicional</h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Características Adicionales</label>
+                <textarea
+                  name="caracteristicas_adicionales"
+                  value={formData.caracteristicas_adicionales}
+                  onChange={handleChange}
+                  placeholder="Detalles adicionales sobre la propiedad..."
+                  rows="4"
+                  className="w-full form-input"
+                />
+              </div>
+            </div>
+            
+            <button type="submit" className="btn-primary px-8 py-3 text-lg font-semibold">
+              ✅ Registrar Piso
+            </button>
+          </form>
+        </div>
+      );
+    };
+
+    // Search Clients Component
+    const SearchClientes = () => {
+      const [pisos, setPisos] = useState([]);
+      const [results, setResults] = useState([]);
+      const [selectedPiso, setSelectedPiso] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      useEffect(() => {
+        fetchPisos();
+      }, []);
+
+      const fetchPisos = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/pisos`, { 
+            headers: { Authorization: `Bearer ${token}` } 
+          });
+          setPisos(await response.json());
+        } catch (error) {
+          alert("Error al cargar pisos: " + error.message);
+        }
+      };
+
+      const handleSearch = async () => {
+        if (!selectedPiso) {
+          alert("Por favor, selecciona un piso");
+          return;
+        }
+        
+        setLoading(true);
+        try {
+          const response = await fetch(`${API_BASE}/match?piso_id=${selectedPiso}`, { 
+            headers: { Authorization: `Bearer ${token}` } 
+          });
+          setResults(await response.json());
+        } catch (error) {
+          alert("Error al buscar clientes: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">🔍 Buscar Clientes</h2>
+            <p className="text-gray-600">Encuentra clientes compatibles para un piso específico</p>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Piso</label>
+              <select
+                value={selectedPiso}
+                onChange={(e) => setSelectedPiso(e.target.value)}
+                className="w-full form-input"
+              >
+                <option value="">Seleccionar un piso...</option>
+                {pisos.map(piso => (
+                  <option key={piso.id} value={piso.id}>
+                    Piso {piso.id} - {Array.isArray(piso.zona) ? piso.zona.join(', ') : piso.zona} ({piso.precio?.toLocaleString()}€) - {piso.m2}m²
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <button 
+              onClick={handleSearch} 
+              disabled={loading || !selectedPiso}
+              className="btn-primary px-6 py-3 font-semibold disabled:opacity-50"
+            >
+              {loading ? "Buscando..." : "🔍 Buscar Clientes"}
+            </button>
+            
+            {results.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Clientes Compatibles ({results.length})
+                </h3>
+                <div className="space-y-3">
+                  {results.map(match => (
+                    <div key={match.cliente_id} className="p-4 bg-gray-50 rounded-lg border">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-gray-900">
+                          Cliente ID: {match.cliente_id}
+                        </span>
+                        <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                          {match.score}% compatibilidad
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {results.length === 0 && selectedPiso && !loading && (
+              <div className="text-center py-8 text-gray-500">
+                No se encontraron clientes compatibles para este piso.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // Search Pisos Component
+    const SearchPisos = () => {
+      const [clientes, setClientes] = useState([]);
+      const [results, setResults] = useState([]);
+      const [selectedCliente, setSelectedCliente] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      useEffect(() => {
+        fetchClientes();
+      }, []);
+
+      const fetchClientes = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/clientes`, { 
+            headers: { Authorization: `Bearer ${token}` } 
+          });
+          setClientes(await response.json());
+        } catch (error) {
+          alert("Error al cargar clientes: " + error.message);
+        }
+      };
+
+      const handleSearch = async () => {
+        if (!selectedCliente) {
+          alert("Por favor, selecciona un cliente");
+          return;
+        }
+        
+        setLoading(true);
+        try {
+          const response = await fetch(`${API_BASE}/match?cliente_id=${selectedCliente}`, { 
+            headers: { Authorization: `Bearer ${token}` } 
+          });
+          setResults(await response.json());
+        } catch (error) {
+          alert("Error al buscar pisos: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">🏢 Buscar Pisos</h2>
+            <p className="text-gray-600">Encuentra propiedades compatibles para un cliente específico</p>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Cliente</label>
+              <select
+                value={selectedCliente}
+                onChange={(e) => setSelectedCliente(e.target.value)}
+                className="w-full form-input"
+              >
+                <option value="">Seleccionar un cliente...</option>
+                {clientes.map(cliente => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nombre || `Cliente ${cliente.id}`} - {Array.isArray(cliente.zona) ? cliente.zona.join(', ') : cliente.zona} - {cliente.precio?.toLocaleString()}€
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <button 
+              onClick={handleSearch} 
+              disabled={loading || !selectedCliente}
+              className="btn-primary px-6 py-3 font-semibold disabled:opacity-50"
+            >
+              {loading ? "Buscando..." : "🏢 Buscar Pisos"}
+            </button>
+            
+            {results.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Pisos Compatibles ({results.length})
+                </h3>
+                <div className="space-y-3">
+                  {results.map(match => (
+                    <div key={match.piso_id} className="p-4 bg-gray-50 rounded-lg border">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-gray-900">
+                          Piso ID: {match.piso_id}
+                        </span>
+                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                          {match.score}% compatibilidad
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {results.length === 0 && selectedCliente && !loading && (
+              <div className="text-center py-8 text-gray-500">
+                No se encontraron pisos compatibles para este cliente.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // Main App Component
+    const App = () => {
+      const [isLoggedIn, setIsLoggedIn] = useState(false);
+      const [activeSection, setActiveSection] = useState('clientes');
+
+      const handleLogin = () => {
+        setIsLoggedIn(true);
+      };
+
+      const handleRegister = () => {
+        // Refresh data after registration if needed
+      };
+
+      const renderActiveSection = () => {
+        switch(activeSection) {
+          case 'clientes':
+            return <ClientForm onRegister={handleRegister} />;
+          case 'pisos':
+            return <PisoForm onRegister={handleRegister} />;
+          case 'searchClientes':
+            return <SearchClientes />;
+          case 'searchPisos':
+            return <SearchPisos />;
+          default:
+            return <ClientForm onRegister={handleRegister} />;
+        }
+      };
+
+      if (!isLoggedIn) {
+        return <LoginForm onLogin={handleLogin} />;
+      }
+
+      return (
+        <div className="flex min-h-screen bg-gray-50">
+          <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+          
+          <div className="flex-1 ml-72">
+            <div className="p-8">
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Dashboard
+                </h1>
+                <p className="text-gray-600">
+                  Gestiona clientes y propiedades con inteligencia artificial
+                </p>
+              </div>
+              
+              {renderActiveSection()}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
 </body>
 </html>
